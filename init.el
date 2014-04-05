@@ -5,6 +5,8 @@
 (defvar my-packages '(
 		      ;; Clojure
 cider clojure-mode clojure-test-mode
+;; lisps
+paredit
 ;; Python
 python-mode
 ;; Scala
@@ -17,6 +19,10 @@ auctex
 dropbox evernote-mode
 ;; Git
 git-commit-mode
+;; auto completion
+auto-complete
+;; fix path
+exec-path-from-shell
 ))
 
 (dolist (p my-packages)
@@ -50,10 +56,8 @@ git-commit-mode
 (add-to-list 'auto-mode-alist '( "\\.py\\'" . python-mode))
 (add-to-list 'interpreter-mode-alist '( "python" . python-mode)) 
 
-;; Fix shell path on OSX
-(defun set-exec-path-from-shell-PATH ()
-  (let ((path-from-shell (shell-command-to-string "$SHELL -i -c 'echo $PATH'")))
-    (setenv "PATH" path-from-shell)
-    (setq exec-path (split-string path-from-shell path-separator))))
 
-(if window-system (set-exec-path-from-shell-PATH))
+;; Cider configuration (clojure)
+;(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode ) 
+(setq cider-repl-result-prefix ";; => " ) 
+( add-hook 'cider-repl-mode-hook 'paredit-mode ) 
