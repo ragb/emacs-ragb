@@ -29,6 +29,8 @@ exec-path-from-shell
   (when (not (package-installed-p p))
     (package-install p)))
 
+;; Initialize path from shell.
+( when ( memq window-system ' ( mac ns )) ( exec-path-from-shell-initialize )) 
 
 
 ;; no startup msg  
