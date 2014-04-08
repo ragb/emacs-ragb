@@ -5,7 +5,7 @@
 (defvar my-packages '(
 		      ;; Clojure
 cider clojure-mode clojure-test-mode
-;; lisps
+;; lisps and so on (works well with emacspeak)
 paredit
 ;; Python
 python-mode
@@ -15,6 +15,8 @@ scala-mode
 go-mode
 ;; LaTeX
 auctex
+;; Markdown Editing
+markdown-mode
 ;; Utilities
 dropbox evernote-mode
 ;; Git
@@ -49,7 +51,7 @@ exec-path-from-shell
 (load-file "~/Sources/emacspeak/lisp/emacspeak-setup.el")
 
 ;(emacspeak-toggle-auditory-icons t)
-(emacspeak-sounds-select-theme "chimes-stereo/")
+;(emacspeak-sounds-select-theme "chimes-stereo/")
 (emacspeak-tts-startup-hook)
 
 
