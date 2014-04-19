@@ -1,6 +1,9 @@
 
 ;; Packages
-( require 'package ) ( add-to-list 'package-archives ' ( "marmalade" . "http://marmalade-repo.org/packages/" )) ( package-initialize ) 
+( require 'package )
+(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
+(package-initialize)
 
 (defvar my-packages '(
 		      ;; Clojure
@@ -10,7 +13,7 @@ paredit
 ;; Python
 python-mode
 ;; Scala
-scala-mode
+scala-mode2 ensime
 ;; Golang
 go-mode
 ;; LaTeX
@@ -20,9 +23,9 @@ markdown-mode
 ;; Utilities
 dropbox evernote-mode
 ;; Git
-git-commit-mode
+git-commit-mode magit
 ;; auto completion
-auto-complete
+auto-complete ac-nrepl
 ;; fix path
 exec-path-from-shell
 ))
@@ -64,7 +67,12 @@ exec-path-from-shell
 ;; Cider configuration (clojure)
 ;(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode ) 
 (setq cider-repl-result-prefix ";; => " ) 
-( add-hook 'cider-repl-mode-hook 'paredit-mode ) 
+( add-hook 'cider-repl-mode-hook 'paredit-mode )
+(require 'ac-nrepl)
+(add-hook 'cider-repl-mode-hook 'ac-nrepl-setup)
+(add-hook 'cider-mode-hook 'ac-nrepl-setup)
+( eval-after-load "auto-complete" ' ( add-to-list 'ac-modes 'cider-repl-mode )) 
+
 
 
 ;; Mac keyboard
