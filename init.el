@@ -15,7 +15,10 @@ python-mode
 ;; Scala
 scala-mode2 ensime
 ;; Golang
-go-mode
+go-mode go-autocomplete
+company-go
+;; Web development
+js2-mode web-beautify
 ;; LaTeX
 auctex
 ;; Markdown Editing
@@ -25,7 +28,7 @@ dropbox evernote-mode
 ;; Git
 git-commit-mode magit
 ;; auto completion
-auto-complete ac-nrepl
+auto-complete ac-nrepl company
 ;; fix path
 exec-path-from-shell
 ))
@@ -67,13 +70,30 @@ exec-path-from-shell
 ;; Cider configuration (clojure)
 ;(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode ) 
 (setq cider-repl-result-prefix ";; => " ) 
+( setq cider-prompt-save-file-on-load nil ) 
 ( add-hook 'cider-repl-mode-hook 'paredit-mode )
-(require 'ac-nrepl)
-(add-hook 'cider-repl-mode-hook 'ac-nrepl-setup)
-(add-hook 'cider-mode-hook 'ac-nrepl-setup)
-( eval-after-load "auto-complete" ' ( add-to-list 'ac-modes 'cider-repl-mode )) 
+(require 'company)
 
 
+
+; Scala
+    ;; This step causes the ensime-mode to be started whenever
+    ;; scala-mode is started for a buffer. You may have to customize this step
+;; if you're not using the standard scala mode.
+(add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
+
+;; Javascript
+( add-hook 'js-mode-hook 'js2-minor-mode)
+
+
+;; go
+(require 'company)                                   ; load company mode
+(require 'company-go)                                ; load company mode go backend
+(add-hook 'go-mode-hook (lambda ()
+                          (set (make-local-variable 'company-backends) '(company-go))
+                          (company-mode)))
+
+(add-hook 'before-save-hook 'gofmt-before-save ) 
 
 ;; Mac keyboard
 (setq default-input-method "MacOSX")
@@ -81,3 +101,5 @@ exec-path-from-shell
 (setq mac-option-modifier 'none)
 
 
+;; save /reload desktop
+(desktop-save-mode 1)
