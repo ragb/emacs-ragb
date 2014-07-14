@@ -1,6 +1,6 @@
 
 ;; Packages
-( require 'package )
+(require 'package )
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
 (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
 (package-initialize)
@@ -11,11 +11,11 @@ cider clojure-mode clojure-test-mode
 ;; lisps and so on (works well with emacspeak)
 paredit
 ;; Python
-python-mode
+python-mode jedi
 ;; Scala
-scala-mode2 ensime
+scala-mode2 ensime sbt-mode
 ;; Golang
-go-mode go-autocomplete
+go-mode
 company-go
 ;; Web development
 js2-mode web-beautify
@@ -65,7 +65,7 @@ exec-path-from-shell
 (autoload 'python-mode "python-mode" "Python Mode." t)
 (add-to-list 'auto-mode-alist '( "\\.py\\'" . python-mode))
 (add-to-list 'interpreter-mode-alist '( "python" . python-mode)) 
-
+( add-hook 'python-mode-hook 'jedi:setup ) ( setq jedi:setup-keys t ) ; optional ( setq jedi:complete-on-dot t ) ; optional 
 
 ;; Cider configuration (clojure)
 ;(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode ) 
@@ -73,12 +73,15 @@ exec-path-from-shell
 ( setq cider-prompt-save-file-on-load nil ) 
 ( add-hook 'cider-repl-mode-hook 'paredit-mode )
 (require 'company)
-
-
+( setq nrepl-hide-special-buffers t ) 
+( setq cider-repl-pop-to-buffer-on-connect nil ) 
+( setq cider-auto-select-error-buffer t ) 
+( setq cider-repl-popup-stacktraces t ) 
+( add-hook 'cider-repl-mode-hook 'subword-mode ) 
 
 ; Scala
-    ;; This step causes the ensime-mode to be started whenever
-    ;; scala-mode is started for a buffer. You may have to customize this step
+;; This step causes the ensime-mode to be started whenever
+;; scala-mode is started for a buffer. You may have to customize this step
 ;; if you're not using the standard scala mode.
 (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
 
@@ -94,6 +97,12 @@ exec-path-from-shell
                           (company-mode)))
 
 (add-hook 'before-save-hook 'gofmt-before-save ) 
+
+;; LaTeX
+(setq TeX-auto-save t)
+(setq TeX-parse-self t)
+(setq-default TeX-master nil)
+
 
 ;; Mac keyboard
 (setq default-input-method "MacOSX")
