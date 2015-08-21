@@ -7,7 +7,7 @@
 
 (defvar my-packages '(
 		      ;; Clojure
-cider clojure-mode clojure-test-mode
+cider clojure-mode
 ;; lisps and so on (works well with emacspeak)
 paredit
 ;; Python
@@ -26,7 +26,7 @@ markdown-mode
 ;; Utilities
 dropbox evernote-mode
 ;; Git
-git-commit-mode magit
+magit
 ;; auto completion
 auto-complete ac-nrepl company
 ;; fix path
@@ -48,16 +48,18 @@ exec-path-from-shell
 ;; Change paths. This is for OSX.
 ;; emacspeak here is from svn, with the mac tts server from
 ;; https://code.google.com/p/e-mac-speak/
-(setq load-path (cons "~/Sources/emacspeak/lisp" load-path))
-(setq emacspeak-directory "~/Sources/emacspeak")
-(setq dtk-program "mac")
-(load-file "~/Sources/emacspeak/lisp/mac-voices.el")
+(when (string-equal system-type "darwin")
+	(setq load-path (cons "~/Sources/emacspeak/lisp" load-path))
+	(setq emacspeak-directory "~/Sources/emacspeak")
+	(setq dtk-program "mac")
+	(load-file "~/Sources/emacspeak/lisp/mac-voices.el")
+	(setq mac-default-speech-rate 450)
+	(load-file "~/Sources/emacspeak/lisp/emacspeak-setup.el"))
 
-(setq mac-default-speech-rate 450)
-(load-file "~/Sources/emacspeak/lisp/emacspeak-setup.el")
 
 ;(emacspeak-toggle-auditory-icons t)
 ;(emacspeak-sounds-select-theme "chimes-stereo/")
+(setq espeak-default-speech-rate 400)
 (emacspeak-tts-startup-hook)
 
 
@@ -105,9 +107,10 @@ exec-path-from-shell
 
 
 ;; Mac keyboard
-(setq default-input-method "MacOSX")
-(setq mac-command-modifier 'meta)
-(setq mac-option-modifier 'none)
+(when (string-equal system-type "darwin")
+  (setq default-input-method "MacOSX")
+  (setq mac-command-modifier 'meta)
+  (setq mac-option-modifier 'none))
 
 
 ;; save /reload desktop
