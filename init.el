@@ -33,6 +33,9 @@ auto-complete ac-nrepl company
 exec-path-from-shell
 ))
 
+(when (not package-archive-contents)
+  (package-refresh-contents))
+
 (dolist (p my-packages)
   (when (not (package-installed-p p))
     (package-install p)))
