@@ -24,12 +24,12 @@ auctex
 ;; Markdown Editing
 markdown-mode
 ;; Utilities
-dropbox evernote-mode
+dropbox
 ;; Git
 magit
 ;; auto completion
 auto-complete ac-nrepl company
-;; fix path
+;; fix itpath
 exec-path-from-shell
 ))
 
@@ -55,9 +55,8 @@ exec-path-from-shell
 	(setq load-path (cons "~/Sources/emacspeak/lisp" load-path))
 	(setq emacspeak-directory "~/Sources/emacspeak")
 	(setq dtk-program "mac")
-	(load-file "~/Sources/emacspeak/lisp/mac-voices.el")
-	(setq mac-default-speech-rate 450)
 	(load-file "~/Sources/emacspeak/lisp/emacspeak-setup.el"))
+	(load-file "~/Sources/emacspeak/lisp/mac-voices.el")
 
 
 ;(emacspeak-toggle-auditory-icons t)
