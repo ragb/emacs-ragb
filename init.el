@@ -1,3 +1,23 @@
+;; Emacspeak stup
+;; Change paths. This is for OSX.
+;; emacspeak here is from svn, with the mac tts server from
+;; https://code.google.com/p/e-mac-speak/
+(when (string-equal system-type "darwin")
+	(setq load-path (cons "~/Sources/emacspeak/lisp" load-path))
+	(setq emacspeak-directory "~/Sources/emacspeak")
+	(setq dtk-program "mac")
+	(load-file "~/Sources/emacspeak/lisp/emacspeak-setup.el")
+	(load-file "~/Sources/emacspeak/lisp/mac-voices.el")
+	(setq mac-default-speech-rate 480))
+
+
+(emacspeak-toggle-auditory-icons t)
+(emacspeak-sounds-select-theme "classic/")
+(setq tts-default-speech-rate 90)
+(setq espeak-default-speech-rate 400)
+(emacspeak-tts-startup-hook)
+
+
 
 ;; Packages
 (require 'package )
@@ -46,24 +66,6 @@ exec-path-from-shell
 
 ;; no startup msg  
 (setq inhibit-startup-message t)        ; Disable startup message 
-
-;; Emacspeak stup
-;; Change paths. This is for OSX.
-;; emacspeak here is from svn, with the mac tts server from
-;; https://code.google.com/p/e-mac-speak/
-(when (string-equal system-type "darwin")
-	(setq load-path (cons "~/Sources/emacspeak/lisp" load-path))
-	(setq emacspeak-directory "~/Sources/emacspeak")
-	(setq dtk-program "mac")
-	(load-file "~/Sources/emacspeak/lisp/emacspeak-setup.el"))
-	(load-file "~/Sources/emacspeak/lisp/mac-voices.el")
-
-
-;(emacspeak-toggle-auditory-icons t)
-;(emacspeak-sounds-select-theme "chimes-stereo/")
-(setq espeak-default-speech-rate 400)
-(emacspeak-tts-startup-hook)
-
 
 ;; Python
 (autoload 'python-mode "python-mode" "Python Mode." t)
