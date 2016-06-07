@@ -3,11 +3,11 @@
 ;; emacspeak here is from svn, with the mac tts server from
 ;; https://code.google.com/p/e-mac-speak/
 (when (string-equal system-type "darwin")
-	(setq load-path (cons "~/Sources/emacspeak/lisp" load-path))
-	(setq emacspeak-directory "~/Sources/emacspeak")
+	(setq load-path (cons "~/src/emacspeak/lisp" load-path))
+	(setq emacspeak-directory "~/src/emacspeak")
 	(setq dtk-program "mac")
-	(load-file "~/Sources/emacspeak/lisp/emacspeak-setup.el")
-	(load-file "~/Sources/emacspeak/lisp/mac-voices.el")
+	(load-file "~/src/emacspeak/lisp/emacspeak-setup.el")
+	(load-file "~/src/emacspeak/lisp/mac-voices.el")
 	(setq mac-default-speech-rate 480))
 
 
@@ -26,14 +26,18 @@
 (package-initialize)
 
 (defvar my-packages '(
+;; Utilities
+use-package
 		      ;; Clojure
 cider clojure-mode
+;; haskell
+haskell-mode
 ;; lisps and so on (works well with emacspeak)
 paredit
 ;; Python
 python-mode jedi
 ;; Scala
-scala-mode2 ensime sbt-mode
+ensime
 ;; Golang
 go-mode
 company-go
@@ -51,6 +55,8 @@ magit
 auto-complete ac-nrepl company
 ;; fix itpath
 exec-path-from-shell
+;; projects
+projectile
 ))
 
 (when (not package-archive-contents)
@@ -73,6 +79,17 @@ exec-path-from-shell
 (add-to-list 'interpreter-mode-alist '( "python" . python-mode)) 
 ( add-hook 'python-mode-hook 'jedi:setup ) ( setq jedi:setup-keys t ) ; optional ( setq jedi:complete-on-dot t ) ; optional 
 
+
+;; Projectile
+(use-package projectile
+  :demand
+  :init   (setq projectile-use-git-grep t)
+  :config (projectile-global-mode t)
+  :bind   (("s-f" . projectile-find-file)
+           ("s-F" . projectile-grep)))
+
+
+
 ;; Cider configuration (clojure)
 ;(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode ) 
 (setq cider-repl-result-prefix ";; => " ) 
@@ -85,11 +102,10 @@ exec-path-from-shell
 ( setq cider-repl-popup-stacktraces t ) 
 ( add-hook 'cider-repl-mode-hook 'subword-mode ) 
 
-; Scala
-;; This step causes the ensime-mode to be started whenever
-;; scala-mode is started for a buffer. You may have to customize this step
-;; if you're not using the standard scala mode.
-(add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
+(use-package ensime
+  :commands ensime ensime-mode)
+
+(add-hook 'scala-mode-hook 'ensime-mode)
 
 ;; Javascript
 ( add-hook 'js-mode-hook 'js2-minor-mode)
@@ -116,6 +132,13 @@ exec-path-from-shell
      (global-set-key "\C-cc" 'org-capture)
      (global-set-key "\C-cb" 'org-iswitchb)
 
+;; magit
+(use-package magit
+  :commands magit-status global-magit-file-mode
+  :init (setq
+         magit-revert-buffers nil)
+       (global-magit-file-mode)
+  :bind (("C-x g" . magit-status)))
 
 ;; Mac keyboard
 (when (string-equal system-type "darwin")
@@ -126,3 +149,18 @@ exec-path-from-shell
 
 ;; save /reload desktop
 (desktop-save-mode 1)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(markdown-command "pandoc")
+ '(package-selected-packages
+   (quote
+    (ws-butler web-beautify simple-httpd scala-mode python-mode paredit markdown-mode magit js2-mode jedi helm-gtags go-autocomplete git-rebase-mode git-commit-mode ggtags function-args flycheck exec-path-from-shell evernote-mode ensime dtrt-indent dropbox company-go company-ghc company-auctex clojure-test-mode clean-aindent-mode ac-nrepl))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
