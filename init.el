@@ -5,10 +5,11 @@
 (when (string-equal system-type "darwin")
 	(setq load-path (cons "~/src/emacspeak/lisp" load-path))
 	(setq emacspeak-directory "~/src/emacspeak")
-	(setq dtk-program "mac")
+	(setq dtk-program "espeak")
 	(load-file "~/src/emacspeak/lisp/emacspeak-setup.el")
 	(load-file "~/src/emacspeak/lisp/mac-voices.el")
-	(setq mac-default-speech-rate 480))
+	(setq mac-default-speech-rate 480)
+	(mac-define-voice 'joana " [{voice joana}] "))
 
 
 (emacspeak-toggle-auditory-icons t)
@@ -17,71 +18,95 @@
 (setq espeak-default-speech-rate 400)
 (emacspeak-tts-startup-hook)
 
+;; global variables
+(setq
+ inhibit-startup-screen t
+ create-lockfiles nil
+ make-backup-files nil
+ column-number-mode t
+ scroll-error-top-bottom t
+ show-paren-delay 0.5
+ use-package-always-ensure t
+ sentence-end-double-space nil)
+
+;; buffer local variables
+(setq-default
+ indent-tabs-mode nil
+ tab-width 4
+ c-basic-offset 4)
+
+;; modes
+(electric-indent-mode 0)
+
+
+;; global keybindings
+(global-unset-key (kbd "C-z"))
+
 
 
 ;; Packages
 (require 'package )
-(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
+(setq
+ package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                    ("org" . "http://orgmode.org/elpa/")
+                    ("melpa" . "http://melpa.org/packages/")
+                    ("melpa-stable" . "http://stable.melpa.org/packages/")))
+
 (package-initialize)
 
 (defvar my-packages '(
 ;; Utilities
 use-package
-		      ;; Clojure
-cider clojure-mode
-;; haskell
-haskell-mode
-;; lisps and so on (works well with emacspeak)
-paredit
-;; Python
-python-mode jedi
-;; Scala
-ensime
-;; Golang
-go-mode
-company-go
-;; Web development
-js2-mode web-beautify
-;; LaTeX
-auctex
-;; Markdown Editing
-markdown-mode
-;; Utilities
-dropbox
-;; Git
-magit
-;; fix itpath
-exec-path-from-shell
-;; projects
-projectile
-;; oarentesis
-smartparens
 ))
 
 (when (not package-archive-contents)
   (package-refresh-contents))
 
 (dolist (p my-packages)
-  (when (not (package-installed-p p))
+ (when (not (package-installed-p p))
     (package-install p)))
 
+(require 'use-package)
+
+
+
 ;; Initialize path from shell.
-( when ( memq window-system ' ( mac ns )) ( exec-path-from-shell-initialize )) 
+(use-package exec-path-from-shell
+  :ensure t
+  :if (memq window-system '(mac ns))
+  :config ( exec-path-from-shell-initialize ))
 
 
-;; no startup msg  
-(setq inhibit-startup-message t)        ; Disable startup message 
+;; org
+(use-package org :ensure t)
 
-;; Python
-(autoload 'python-mode "python-mode" "Python Mode." t)
-(add-to-list 'auto-mode-alist '( "\\.py\\'" . python-mode))
-(add-to-list 'interpreter-mode-alist '( "python" . python-mode)) 
-( add-hook 'python-mode-hook 'jedi:setup ) ( setq jedi:setup-keys t ) ; optional ( setq jedi:complete-on-dot t ) ; optional 
+
+
+;; Company
+(use-package company
+  :diminish company-mode
+  :commands company-mode
+  :init
+  (setq
+   company-dabbrev-ignore-case nil
+   company-dabbrev-code-ignore-case nil
+   company-dabbrev-downcase nil
+   company-idle-delay 0
+   company-minimum-prefix-length 4))
+
+(use-package ensime :ensure t :pin melpa-stable)
+
+(use-package yasnippet
+  :diminish yas-global-mode
+  :config (yas-reload-all))
+(use-package winner :ensure t
+  :defer t)
+
 
 
 ;; Projectile
 (use-package projectile
+  :ensure t
   :demand
   :init   (setq projectile-use-git-grep t)
   :config (projectile-global-mode t)
@@ -90,55 +115,21 @@ smartparens
 
 
 
-;; Cider configuration (clojure)
-;(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode ) 
-(setq cider-repl-result-prefix ";; => " ) 
-( setq cider-prompt-save-file-on-load nil ) 
-( add-hook 'cider-repl-mode-hook 'paredit-mode )
-(require 'company)
-( setq nrepl-hide-special-buffers t ) 
-( setq cider-repl-pop-to-buffer-on-connect nil ) 
-( setq cider-auto-select-error-buffer t ) 
-( setq cider-repl-popup-stacktraces t ) 
-( add-hook 'cider-repl-mode-hook 'subword-mode ) 
-
-(use-package ensime
-  :commands ensime ensime-mode)
-
-(add-hook 'scala-mode-hook 'ensime-mode)
-
-;; Javascript
-( add-hook 'js-mode-hook 'js2-minor-mode)
-
-
-;; go
-(require 'company)                                   ; load company mode
-(require 'company-go)                                ; load company mode go backend
-(add-hook 'go-mode-hook (lambda ()
-                          (set (make-local-variable 'company-backends) '(company-go))
-                          (company-mode)))
-
-(add-hook 'before-save-hook 'gofmt-before-save ) 
-
-;; LaTeX
-(setq TeX-auto-save t)
-(setq TeX-parse-self t)
-(setq-default TeX-master nil)
-
-
-;; Org
-     (global-set-key "\C-cl" 'org-store-link)
-     (global-set-key "\C-ca" 'org-agenda)
-     (global-set-key "\C-cc" 'org-capture)
-     (global-set-key "\C-cb" 'org-iswitchb)
-
 ;; magit
 (use-package magit
+  :ensure t
   :commands magit-status global-magit-file-mode
   :init (setq
          magit-revert-buffers nil)
        (global-magit-file-mode)
   :bind (("C-x g" . magit-status)))
+
+;;(use-package phabricator)
+
+
+;; Markdown
+(use-package markdown-mode :ensure t
+  :config (setq markdown-command "pandoc"))
 
 ;; parentesis
 (use-package smartparens
@@ -170,8 +161,28 @@ smartparens
 ;; Mac keyboard
 (when (string-equal system-type "darwin")
   (setq default-input-method "MacOSX")
-  (setq mac-command-modifier 'meta)
-  (setq mac-option-modifier 'none))
+    (setq mac-option-key-is-meta nil)
+    (setq mac-command-key-is-meta t)
+    (setq mac-command-modifier 'meta)
+    (setq mac-option-modifier nil))
+
+
+
+(add-hook 'scala-mode-hook
+          (lambda ()
+            (show-paren-mode)
+            (smartparens-mode)
+            (yas-minor-mode)
+(define-key yas-minor-mode-map (kbd "<tab>") nil)
+(define-key yas-minor-mode-map (kbd "TAB") nil)
+(define-key yas-minor-mode-map (kbd "<C-tab>") 'yas-expand)
+            (company-mode)
+            (ensime-mode)
+            (scala-mode:goto-start-of-code)
+            (voice-lock-mode nil)))
+
+
+
 
 
 ;; save /reload desktop
@@ -181,10 +192,9 @@ smartparens
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(markdown-command "pandoc")
  '(package-selected-packages
    (quote
-    (ws-butler web-beautify simple-httpd scala-mode python-mode paredit markdown-mode magit js2-mode jedi helm-gtags go-autocomplete git-rebase-mode git-commit-mode ggtags function-args flycheck exec-path-from-shell evernote-mode ensime dtrt-indent dropbox company-go company-ghc company-auctex clojure-test-mode clean-aindent-mode))))
+    (phabricator flycheck-pony image-archive flx-isearch flx-search flx-ido use-package smartparens projectile markdown-mode magit exec-path-from-shell ensime))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
