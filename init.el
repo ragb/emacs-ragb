@@ -3,6 +3,7 @@
 ;; emacspeak here is from svn, with the mac tts server from
 ;; https://code.google.com/p/e-mac-speak/
 (when (string-equal system-type "darwin")
+  (setq ns-pop-up-frames nil)
 	(setq load-path (cons "~/src/emacspeak/lisp" load-path))
 	(setq emacspeak-directory "~/src/emacspeak")
 	(setq dtk-program "espeak")
@@ -16,6 +17,9 @@
 (emacspeak-sounds-select-theme "classic/")
 (setq tts-default-speech-rate 90)
 (setq espeak-default-speech-rate 400)
+(setq emacspeak-tts-use-notify-stream  t)
+
+(setq emacspeak-eldoc-speak-explicitly nil)
 (emacspeak-tts-startup-hook)
 
 ;; global variables
@@ -29,6 +33,8 @@
  use-package-always-ensure t
  sentence-end-double-space nil)
 
+
+
 ;; buffer local variables
 (setq-default
  indent-tabs-mode nil
@@ -36,7 +42,7 @@
  c-basic-offset 4)
 
 ;; modes
-(electric-indent-mode 0)
+;;(electric-indent-mode 0)
 
 
 ;; global keybindings
@@ -50,23 +56,15 @@
  package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                     ("org" . "http://orgmode.org/elpa/")
                     ("melpa" . "http://melpa.org/packages/")
-                    ("melpa-stable" . "http://stable.melpa.org/packages/")))
+                    ("melpa-stable" . "http://stable.melpa.org/packages/")
+))
 
 (package-initialize)
 
-(defvar my-packages '(
-;; Utilities
-use-package
-))
-
-(when (not package-archive-contents)
-  (package-refresh-contents))
-
-(dolist (p my-packages)
- (when (not (package-installed-p p))
-    (package-install p)))
-
-(require 'use-package)
+;; Bootstrap `use-package'
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
 
 
 
@@ -77,10 +75,56 @@ use-package
   :config ( exec-path-from-shell-initialize ))
 
 
+
 ;; org
-(use-package org :ensure t)
+(use-package org :ensure t
+  :config
+                 (setq org-log-done 'time)
+             (setq org-directory "~/org/")
+             ;(setq org-mobile-use-encryption t)
+             (setq org-mobile-encryption-password "OrleansGodiva")
+             (setq org-mobile-index-file "index.org")
+    (setq org-mobile-directory "~/Dropbox/Aplicativos/MobileOrg")
+    (setq org-mobile-inbox-for-pull "~/org/inbox.org")
+    (setq org-mobile-files '("~/org/dev.org"))
+    (setq org-clock-idle-time 10)
+    (setq org-default-notes-file (concat org-directory "notes.org"))
+    (setq org-refile-targets '((nil :maxlevel . 9)
+                                (org-agenda-files :maxlevel . 9)))
+(setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
+(setq org-refile-use-outline-path t)                  ; Show full paths for refiling
+
+(setq org-capture-templates
+      '(("t" "Todo" entry (file+headline (concat org-directory "todos.org") "Tasks")
+             "* TODO %?\n  %i\n  %a")
+        ("j" "Journal" entry (file+datetree (concat org-directory "journal.org"))
+             "* %? %^g\nEntered on %U\n  %i\n  %a")))
+
+                 (global-set-key "\C-cl" 'org-store-link)
+             (global-set-key "\C-cc" 'org-capture)
+             (global-set-key "\C-ca" 'org-agenda)
+             (global-set-key "\C-cb" 'org-iswitchb)
+    )
 
 
+
+
+;; helm
+(use-package helm
+  :ensure t
+  :config (require 'helm-config)
+  (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
+      helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+      helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+      helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+      helm-ff-file-name-history-use-recentf t)
+(when (executable-find "curl") (setq helm-google-suggest-use-curl-p t)))
+
+;; rust
+(use-package rust-mode)
+
+;; Idris
+(use-package idris-mode)
 
 ;; Company
 (use-package company
@@ -94,7 +138,10 @@ use-package
    company-idle-delay 0
    company-minimum-prefix-length 4))
 
-(use-package ensime :ensure t :pin melpa-stable)
+(use-package ensime :ensure t :pin melpa
+  :init (setq ensime-use-helm nil) (setq ensime-eldoc-hints 'all))
+(use-package sbt-mode :ensure t :pin melpa)
+(use-package scala-mode :ensure t :pin melpa)
 
 (use-package yasnippet
   :diminish yas-global-mode
@@ -102,6 +149,10 @@ use-package
 (use-package winner :ensure t
   :defer t)
 
+
+
+;; ag
+(use-package ag :ensure t)
 
 
 ;; Projectile
@@ -122,7 +173,10 @@ use-package
   :init (setq
          magit-revert-buffers nil)
        (global-magit-file-mode)
-  :bind (("C-x g" . magit-status)))
+       :bind (("C-x g" . magit-status)))
+
+(use-package git-link :ensure t)
+
 
 ;;(use-package phabricator)
 
@@ -192,9 +246,10 @@ use-package
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(org-agenda-files (quote ("~/org/todos.org" "~/org/dev.org")))
  '(package-selected-packages
    (quote
-    (phabricator flycheck-pony image-archive flx-isearch flx-search flx-ido use-package smartparens projectile markdown-mode magit exec-path-from-shell ensime))))
+    (jira-markup-mode slack jira git-link org-jira ag yaml-mode rust-mode helm-idris idris-mode helm phabricator flycheck-pony image-archive flx-isearch flx-search flx-ido use-package smartparens projectile markdown-mode magit exec-path-from-shell ensime))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
