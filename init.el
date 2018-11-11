@@ -12,15 +12,16 @@
 	(setq mac-default-speech-rate 480)
 	(mac-define-voice 'joana " [{voice joana}] "))
 
-
 (emacspeak-toggle-auditory-icons t)
 (emacspeak-sounds-select-theme "classic/")
 (setq tts-default-speech-rate 90)
 (setq espeak-default-speech-rate 400)
 (setq emacspeak-tts-use-notify-stream  t)
+(setq emacspeak-play-program "afplay")
 
-(setq emacspeak-eldoc-speak-explicitly nil)
+;(setq emacspeak-eldoc-speak-explicitly nil)
 (emacspeak-tts-startup-hook)
+(dtk-set-language "pt-pt")
 
 ;; global variables
 (setq
@@ -53,7 +54,7 @@
 ;; Packages
 (require 'package )
 (setq
- package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+ package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                     ("org" . "http://orgmode.org/elpa/")
                     ("melpa" . "http://melpa.org/packages/")
                     ("melpa-stable" . "http://stable.melpa.org/packages/")
@@ -80,7 +81,9 @@
 (use-package org :ensure t
   :config
                  (setq org-log-done 'time)
-             (setq org-directory "~/org/")
+                 (setq org-directory "~/org/")
+                 (setq org-agenda-include-diary t)
+
              ;(setq org-mobile-use-encryption t)
              (setq org-mobile-encryption-password "OrleansGodiva")
              (setq org-mobile-index-file "index.org")
@@ -91,21 +94,28 @@
     (setq org-default-notes-file (concat org-directory "notes.org"))
     (setq org-refile-targets '((nil :maxlevel . 9)
                                 (org-agenda-files :maxlevel . 9)))
-(setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
-(setq org-refile-use-outline-path t)                  ; Show full paths for refiling
+    (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
+    (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
+    (setq org-agenda-skip-deadline-if-done t)
+    (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
+    (setq org-agenda-skip-scheduled-if-done t)
 
 (setq org-capture-templates
-      '(("t" "Todo" entry (file+headline (concat org-directory "todos.org") "Tasks")
+      '(("t" "Todo" entry (file+headline "todos.org" "Tasks")
              "* TODO %?\n  %i\n  %a")
-        ("j" "Journal" entry (file+datetree (concat org-directory "journal.org"))
+        ("j" "Journal" entry (file+datetree "journal.org")
              "* %? %^g\nEntered on %U\n  %i\n  %a")))
 
-                 (global-set-key "\C-cl" 'org-store-link)
-             (global-set-key "\C-cc" 'org-capture)
-             (global-set-key "\C-ca" 'org-agenda)
-             (global-set-key "\C-cb" 'org-iswitchb)
+    :bind (("\C-cl" . org-store-link)
+             ("\C-cc" . org-capture)
+             ("\C-ca" . org-agenda)
+             ("\C-cb" . org-iswitchb))
     )
 
+
+
+
+(use-package grab-mac-link)
 
 
 
@@ -123,6 +133,14 @@
 ;; rust
 (use-package rust-mode)
 
+(use-package racer
+  :init (add-hook 'rust-mode-hook #'racer-mode)
+  (add-hook 'racer-mode-hook #'eldoc-mode)
+            (require 'rust-mode)
+            (define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
+            (setq company-tooltip-align-annotations t)
+            )
+
 ;; Idris
 (use-package idris-mode)
 
@@ -138,10 +156,15 @@
    company-idle-delay 0
    company-minimum-prefix-length 4))
 
-(use-package ensime :ensure t :pin melpa
-  :init (setq ensime-use-helm nil) (setq ensime-eldoc-hints 'all))
-(use-package sbt-mode :ensure t :pin melpa)
-(use-package scala-mode :ensure t :pin melpa)
+
+
+(use-package ensime :ensure t :pin melpa-stable
+  :init (setq ensime-search-interface 'helm)
+  (setq ensime-eldoc-hints 'error))
+
+(use-package sbt-mode :ensure t :pin melpa-stable)
+(use-package scala-mode :ensure t :pin melpa-stable
+  :mode "\\.sc$")
 
 (use-package yasnippet
   :diminish yas-global-mode
@@ -150,19 +173,28 @@
   :defer t)
 
 
-
 ;; ag
 (use-package ag :ensure t)
 
 
 ;; Projectile
+
 (use-package projectile
   :ensure t
-  :demand
-  :init   (setq projectile-use-git-grep t)
-  :config (projectile-global-mode t)
-  :bind   (("s-f" . projectile-find-file)
-           ("s-F" . projectile-grep)))
+  :config
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (projectile-mode +1))
+
+(use-package org-projectile
+  :bind (("C-c n p" . org-projectile-project-todo-completing-read))
+  :config
+  (progn
+    (setq org-projectile-projects-file
+          "~/org/projects.org")
+    (setq org-agenda-files (append org-agenda-files (org-projectile-todo-files)))
+    (push (org-projectile-project-todo-entry) org-capture-templates))
+  :ensure t)
 
 
 
@@ -175,8 +207,11 @@
        (global-magit-file-mode)
        :bind (("C-x g" . magit-status)))
 
-(use-package git-link :ensure t)
+(use-package git-link :ensure t
+  :config (add-to-list 'git-link-commit-remote-alist '("git\\.sys\\.off\\.192\\.internal" git-link-gitlab)))
 
+
+(use-package magit-gerrit :ensure t)
 
 ;;(use-package phabricator)
 
@@ -186,7 +221,7 @@
   :config (setq markdown-command "pandoc"))
 
 ;; parentesis
-(use-package smartparens
+(use-package smartparens :ensure t
   :diminish smartparens-mode
   :commands
   smartparens-strict-mode
@@ -212,7 +247,38 @@
   (sp-local-pair 'scala-mode "(" nil :post-handlers '(("||\n[i]" "RET")))
 (sp-local-pair 'scala-mode "{" nil :post-handlers '(("||\n[i]" "RET") ("| " "SPC"))))
 
-;; Mac keyboard
+
+(use-package intero :ensure t
+  :config
+  (add-hook 'haskell-mode-hook 'intero-mode))
+
+
+;; Mastodon
+(use-package mastodon
+  :init
+  (setq mastodon-instance-url "https://functional.cafe"))
+
+
+;; Purescript
+(use-package purescript-mode
+  :mode "\\.purs$")
+  
+(use-package psc-ide
+  :commands (psc-ide-mode turn-on-purescript-indent)
+  :init(add-hook 'purescript-mode-hook #'(lambda()
+                                          (progn
+                                            (psc-ide-mode)
+                                            (company-mode)
+                                            (flycheck-mode)
+                                            (turn-on-purescript-indent)))))
+                                            
+
+;; epubs
+(use-package nov
+  :mode (("\\.epub$" . nov-mode)))
+
+
+  ;; Mac keyboard
 (when (string-equal system-type "darwin")
   (setq default-input-method "MacOSX")
     (setq mac-option-key-is-meta nil)
@@ -237,6 +303,31 @@
 
 
 
+;; alert
+(use-package alert
+  :config
+  (when (string-equal system-type "darwin")
+  (setq alert-default-style 'notifier)))
+
+
+(use-package org-alert
+  :init (setq org-alert-interval 3600)
+  :config(org-alert-enable))
+
+
+(use-package org-pomodoro
+  :config (setq org-pomodoro-ticking-sound-p nil))
+
+
+(add-hook 'emacs-lisp-mode-hook #'(lambda()
+                        (company-mode)))
+
+
+;; Unspell
+(when   (executable-find "hunspell") 
+  (setq-default ispell-program-name "hunspell") 
+  (setq ispell-really-hunspell t))
+
 
 
 ;; save /reload desktop
@@ -246,13 +337,23 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-agenda-files (quote ("~/org/todos.org" "~/org/dev.org")))
+ '(org-agenda-files
+   (quote
+    ("~/org/projects.org" "~/org/enear.org" "~/org/tiflotecnia.org" "~/org/todos.org" "~/org/research.org" "~/org/dev.org" "~/org/acapo.org")))
+ '(org-modules
+   (quote
+    (org-bbdb org-bibtex org-docview org-gnus org-info org-irc org-mhe org-protocol org-rmail org-w3m org-jira org-mac-iCal org-mac-link)))
  '(package-selected-packages
    (quote
-    (jira-markup-mode slack jira git-link org-jira ag yaml-mode rust-mode helm-idris idris-mode helm phabricator flycheck-pony image-archive flx-isearch flx-search flx-ido use-package smartparens projectile markdown-mode magit exec-path-from-shell ensime))))
+    (nov purescript-mode psc-ide json-mode mastodon org-projectile org-index org-jira git-timemachine ctags-update etags-select popup-imenu goto-chg undo-tree gitlab yasnippet-snippets sound-wav org-pomodoro org-alert grabe-mac-link grab-mac-link speechd-el company-racer racer magit-gerrit org-projectile-helm ensime intero jira-markup-mode slack jira git-link ag yaml-mode rust-mode helm-idris idris-mode helm phabricator flycheck-pony image-archive flx-isearch flx-search flx-ido use-package smartparens projectile markdown-mode magit exec-path-from-shell)))
+ '(safe-local-variable-values
+   (quote
+    ((folded-file . t)
+     (giralib-url . "https://icdpub.jira.com")))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+(put 'downcase-region 'disabled nil)
