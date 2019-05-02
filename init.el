@@ -32,6 +32,7 @@
  scroll-error-top-bottom t
  show-paren-delay 0.5
  use-package-always-ensure t
+ use-package-always-defer t
  sentence-end-double-space nil)
 
 
@@ -72,8 +73,10 @@
 ;; Initialize path from shell.
 (use-package exec-path-from-shell
   :ensure t
-  :if (memq window-system '(mac ns))
+  :demand t
+  :if (memq (window-system) '(mac ns))
   :config ( exec-path-from-shell-initialize ))
+
 
 
 
@@ -83,14 +86,13 @@
                  (setq org-log-done 'time)
                  (setq org-directory "~/org/")
                  (setq org-agenda-include-diary t)
+;                 (setq org-agenda-add-span "DAY")
 
-             ;(setq org-mobile-use-encryption t)
-             (setq org-mobile-encryption-password "OrleansGodiva")
-             (setq org-mobile-index-file "index.org")
-    (setq org-mobile-directory "~/Dropbox/Aplicativos/MobileOrg")
-    (setq org-mobile-inbox-for-pull "~/org/inbox.org")
-    (setq org-mobile-files '("~/org/dev.org"))
+
+    (setq org-clock-out-when-done t)
     (setq org-clock-idle-time 10)
+    (setq org-clock-history-length 10)
+    (setq org-clock-in-switch-to-state "STARTED")
     (setq org-default-notes-file (concat org-directory "notes.org"))
     (setq org-refile-targets '((nil :maxlevel . 9)
                                 (org-agenda-files :maxlevel . 9)))
@@ -100,22 +102,39 @@
     (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
     (setq org-agenda-skip-scheduled-if-done t)
 
+    (setq org-global-properties
+    '(("Effort_ALL". "0 0:10 0:30 1:00 2:00 3:00 4:00 8:00")))
+
 (setq org-capture-templates
-      '(("t" "Todo" entry (file+headline "todos.org" "Tasks")
-             "* TODO %?\n  %i\n  %a")
+      '(
+        ("t" "Todo")
+        ("tt" "Todo-normal" entry (file "inbox.org")
+         "* TODO %?\n  %i\n  %a")
+        ("ts" "Todo-safari" entry (file "inbox.org")
+         "* TODO %?\n %(org-mac-safari-get-frontmost-url)")
+        ("n" "General notes")
+        ("nc" "Note from clipboard contents" entry (file "inbox.org")
+         "* %?\n- Stored on %U\n\n%x")
+
+                ("nl" "Note from current position" entry (file "inbox.org")
+         "* %?\n- Stored on %U\n\n  %i\n  %a")
         ("j" "Journal" entry (file+datetree "journal.org")
-             "* %? %^g\nEntered on %U\n  %i\n  %a")))
+         "* %? %^g\nEntered on %U\n  %i\n  %a")
+      ("c" "Note on current task" item (clock))))
 
     :bind (("\C-cl" . org-store-link)
              ("\C-cc" . org-capture)
              ("\C-ca" . org-agenda)
-             ("\C-cb" . org-iswitchb))
+             ("\C-c C-j" . org-clock-goto)
+             ("\C-c C-p" . org-pomodoro)
+             ("\C-cb" . org-switchb))
     )
 
 
 
 
 (use-package grab-mac-link)
+
 
 
 
@@ -137,7 +156,7 @@
   :init (add-hook 'rust-mode-hook #'racer-mode)
   (add-hook 'racer-mode-hook #'eldoc-mode)
             (require 'rust-mode)
-            (define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
+            (define-key rust-mode-map (kbd "<TAB>") #'company-indent-or-complete-common)
             (setq company-tooltip-align-annotations t)
             )
 
@@ -158,13 +177,41 @@
 
 
 
-(use-package ensime :ensure t :pin melpa-stable
-  :init (setq ensime-search-interface 'helm)
-  (setq ensime-eldoc-hints 'error))
 
-(use-package sbt-mode :ensure t :pin melpa-stable)
-(use-package scala-mode :ensure t :pin melpa-stable
-  :mode "\\.sc$")
+;; Enable scala-mode and sbt-mode
+(use-package scala-mode :ensure t :defer t :pin melpa
+  :mode "\\.s\\(cala\\|bt\\)$"
+  :bind (:map scala-mode-map ("C-c C-B c" . sbt-command))
+  )
+
+
+(use-package sbt-mode :ensure t :pin melpa
+  :commands sbt-start sbt-command
+  :config
+  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+  ;; allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map))
+
+;; Enable nice rendering of diagnostics like compile errors.
+(use-package flycheck :ensure t :pin melpa
+  :init (global-flycheck-mode))
+
+(use-package lsp-mode :ensure t :defer t :pin melpa
+ :init (setq lsp-prefer-flymake nil))
+
+(use-package lsp-ui :ensure t :pin melpa
+  :hook (lsp-mode . lsp-ui-mode))
+
+(use-package lsp-scala :ensure t :pin melpa
+  :after scala-mode
+  :demand t
+  ;; Optional - enable lsp-scala automatically in scala files
+  :hook (scala-mode . lsp))
+
+(use-package company-lsp :ensure t)
 
 (use-package yasnippet
   :diminish yas-global-mode
@@ -201,7 +248,7 @@
 ;; magit
 (use-package magit
   :ensure t
-  :commands magit-status global-magit-file-mode
+  :commands magit-status magit-dispatch global-magit-file-mode
   :init (setq
          magit-revert-buffers nil)
        (global-magit-file-mode)
@@ -213,7 +260,16 @@
 
 (use-package magit-gerrit :ensure t)
 
-;;(use-package phabricator)
+
+(use-package forge
+  :after magit
+  :pin melpa
+  :config
+  (add-to-list 'forge-alist '("git.sys.off.192.internal" "git.sys.off.192.internal/api/v4" "git.sys.off.192.internal" forge-gitlab-repository)))
+
+
+
+
 
 
 ;; Markdown
@@ -296,8 +352,8 @@
 (define-key yas-minor-mode-map (kbd "<tab>") nil)
 (define-key yas-minor-mode-map (kbd "TAB") nil)
 (define-key yas-minor-mode-map (kbd "<C-tab>") 'yas-expand)
-            (company-mode)
-            (ensime-mode)
+(company-mode)
+(define-key scala-mode-map (kbd "<tab>") #'company-indent-or-complete-common)
             (scala-mode:goto-start-of-code)
             (voice-lock-mode nil)))
 
@@ -339,16 +395,17 @@
  ;; If there is more than one, they won't work right.
  '(org-agenda-files
    (quote
-    ("~/org/projects.org" "~/org/enear.org" "~/org/tiflotecnia.org" "~/org/todos.org" "~/org/research.org" "~/org/dev.org" "~/org/acapo.org")))
+    ("~/org/inbox.org" "~/org/dev.org" "~/org/casa.org" "~/org/enear.org" "~/org/projects.org" "~/org/acapo.org")))
  '(org-modules
    (quote
-    (org-bbdb org-bibtex org-docview org-gnus org-info org-irc org-mhe org-protocol org-rmail org-w3m org-jira org-mac-iCal org-mac-link)))
+    (org-bbdb org-bibtex org-docview org-gnus org-habit org-id org-info org-irc org-mhe org-protocol org-rmail org-w3m org-git-link org-mac-iCal org-mac-link org-panel org-screenshot org-jira)))
  '(package-selected-packages
    (quote
-    (nov purescript-mode psc-ide json-mode mastodon org-projectile org-index org-jira git-timemachine ctags-update etags-select popup-imenu goto-chg undo-tree gitlab yasnippet-snippets sound-wav org-pomodoro org-alert grabe-mac-link grab-mac-link speechd-el company-racer racer magit-gerrit org-projectile-helm ensime intero jira-markup-mode slack jira git-link ag yaml-mode rust-mode helm-idris idris-mode helm phabricator flycheck-pony image-archive flx-isearch flx-search flx-ido use-package smartparens projectile markdown-mode magit exec-path-from-shell)))
+    (csv-mode company-lsp forge org-plus-contrib org-make-toc epresent presentation org-present magit-filenotify magit-popup groovy-mode company-irony irony nov purescript-mode psc-ide json-mode mastodon org-projectile org-index org-jira git-timemachine ctags-update etags-select popup-imenu goto-chg undo-tree yasnippet-snippets sound-wav org-pomodoro org-alert grabe-mac-link grab-mac-link speechd-el company-racer racer magit-gerrit org-projectile-helm intero jira-markup-mode slack jira git-link ag yaml-mode rust-mode helm-idris idris-mode helm phabricator flycheck-pony image-archive flx-isearch flx-search flx-ido use-package smartparens projectile markdown-mode magit exec-path-from-shell)))
  '(safe-local-variable-values
    (quote
-    ((folded-file . t)
+    ((voice-lock-mode . t)
+     (folded-file . t)
      (giralib-url . "https://icdpub.jira.com")))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
