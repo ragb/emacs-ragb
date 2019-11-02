@@ -1,7 +1,8 @@
+
+
+
 ;; Emacspeak stup
 ;; Change paths. This is for OSX.
-;; emacspeak here is from svn, with the mac tts server from
-;; https://code.google.com/p/e-mac-speak/
 (when (string-equal system-type "darwin")
   (setq ns-pop-up-frames nil)
 	(setq load-path (cons "~/src/emacspeak/lisp" load-path))
@@ -19,7 +20,7 @@
 (setq emacspeak-tts-use-notify-stream  t)
 (setq emacspeak-play-program "afplay")
 
-;(setq emacspeak-eldoc-speak-explicitly nil)
+(setq emacspeak-eldoc-speak-explicitly nil)
 (emacspeak-tts-startup-hook)
 (dtk-set-language "pt-pt")
 
@@ -34,6 +35,8 @@
  use-package-always-ensure t
  use-package-always-defer t
  sentence-end-double-space nil)
+
+
 
 
 
@@ -75,7 +78,10 @@
   :ensure t
   :demand t
   :if (memq (window-system) '(mac ns))
-  :config ( exec-path-from-shell-initialize ))
+  :init
+    (exec-path-from-shell-initialize )
+    (exec-path-from-shell-copy-envs '("LANG" "GPG_AGENT_INFO" "SSH_AUTH_SOCK"))
+    )
 
 
 
@@ -83,7 +89,8 @@
 ;; org
 (use-package org :ensure t
   :config
-                 (setq org-log-done 'time)
+  (setq org-log-done 'time)
+  (setq org-babel-load-languages '((amm . t) (haskell . t) (python . t) (scala . t)))
                  (setq org-directory "~/org/")
                  (setq org-agenda-include-diary t)
 ;                 (setq org-agenda-add-span "DAY")
@@ -109,7 +116,7 @@
       '(
         ("t" "Todo")
         ("tt" "Todo-normal" entry (file "inbox.org")
-         "* TODO %?\n  %i\n  %a")
+         "* TODO %?\n")
         ("ts" "Todo-safari" entry (file "inbox.org")
          "* TODO %?\n %(org-mac-safari-get-frontmost-url)")
         ("n" "General notes")
@@ -130,6 +137,9 @@
              ("\C-cb" . org-switchb))
     )
 
+
+
+(use-package org-re-reveal :ensure t)
 
 
 
@@ -155,10 +165,12 @@
 (use-package racer
   :init (add-hook 'rust-mode-hook #'racer-mode)
   (add-hook 'racer-mode-hook #'eldoc-mode)
+  (add-hook 'racer-mode-hook #'company-mode)
             (require 'rust-mode)
-            (define-key rust-mode-map (kbd "<TAB>") #'company-indent-or-complete-common)
+            (define-key rust-mode-map (kbd "\t") #'company-indent-or-complete-common)
             (setq company-tooltip-align-annotations t)
             )
+
 
 ;; Idris
 (use-package idris-mode)
@@ -200,18 +212,18 @@
   :init (global-flycheck-mode))
 
 (use-package lsp-mode :ensure t :defer t :pin melpa
- :init (setq lsp-prefer-flymake nil))
-
-(use-package lsp-ui :ensure t :pin melpa
-  :hook (lsp-mode . lsp-ui-mode))
-
-(use-package lsp-scala :ensure t :pin melpa
-  :after scala-mode
-  :demand t
-  ;; Optional - enable lsp-scala automatically in scala files
+  :init (setq lsp-prefer-flymake nil)
   :hook (scala-mode . lsp))
 
+
+(use-package lsp-ui :ensure t)
+
+
+  
+
 (use-package company-lsp :ensure t)
+
+(use-package ammonite-term-repl)
 
 (use-package yasnippet
   :diminish yas-global-mode
@@ -372,7 +384,13 @@
 
 
 (use-package org-pomodoro
-  :config (setq org-pomodoro-ticking-sound-p nil))
+  :config
+    (setq org-pomodoro-keep-killed-pomodoro-time t)
+    (setq org-pomodoro-ticking-frequency 60)
+    (setq org-pomodoro-ask-upon-killing nil)
+    (setq org-pomodoro-manual-break t)
+    )
+
 
 
 (add-hook 'emacs-lisp-mode-hook #'(lambda()
@@ -395,13 +413,13 @@
  ;; If there is more than one, they won't work right.
  '(org-agenda-files
    (quote
-    ("~/org/inbox.org" "~/org/dev.org" "~/org/casa.org" "~/org/enear.org" "~/org/projects.org" "~/org/acapo.org")))
+    ("~/org/cs.org" "~/org/acapo.org" "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/google.org" "~/org/casa.org" "~/org/inbox.org" "~/org/dev.org" "~/org/projects.org" "~/org/music.org")))
  '(org-modules
    (quote
     (org-bbdb org-bibtex org-docview org-gnus org-habit org-id org-info org-irc org-mhe org-protocol org-rmail org-w3m org-git-link org-mac-iCal org-mac-link org-panel org-screenshot org-jira)))
  '(package-selected-packages
    (quote
-    (csv-mode company-lsp forge org-plus-contrib org-make-toc epresent presentation org-present magit-filenotify magit-popup groovy-mode company-irony irony nov purescript-mode psc-ide json-mode mastodon org-projectile org-index org-jira git-timemachine ctags-update etags-select popup-imenu goto-chg undo-tree yasnippet-snippets sound-wav org-pomodoro org-alert grabe-mac-link grab-mac-link speechd-el company-racer racer magit-gerrit org-projectile-helm intero jira-markup-mode slack jira git-link ag yaml-mode rust-mode helm-idris idris-mode helm phabricator flycheck-pony image-archive flx-isearch flx-search flx-ido use-package smartparens projectile markdown-mode magit exec-path-from-shell)))
+    (flycheck-rust cargo ammonite-term-repl ob-ammonite org-re-reveal ox-reveal htmlize sql-indent format-sql csv-mode company-lsp forge org-plus-contrib org-make-toc epresent presentation org-present magit-filenotify magit-popup groovy-mode company-irony irony nov purescript-mode psc-ide json-mode mastodon org-projectile org-index org-jira git-timemachine ctags-update etags-select popup-imenu goto-chg undo-tree yasnippet-snippets sound-wav org-pomodoro org-alert grabe-mac-link grab-mac-link speechd-el company-racer racer magit-gerrit org-projectile-helm intero jira-markup-mode slack jira git-link ag yaml-mode rust-mode helm-idris idris-mode helm phabricator flycheck-pony image-archive flx-isearch flx-search flx-ido use-package smartparens projectile markdown-mode magit exec-path-from-shell)))
  '(safe-local-variable-values
    (quote
     ((voice-lock-mode . t)
@@ -414,3 +432,5 @@
  ;; If there is more than one, they won't work right.
  )
 (put 'downcase-region 'disabled nil)
+(put 'scroll-left 'disabled nil)
+(put 'upcase-region 'disabled nil)
