@@ -102,12 +102,14 @@
     (setq org-clock-in-switch-to-state "STARTED")
     (setq org-default-notes-file (concat org-directory "notes.org"))
     (setq org-refile-targets '((nil :maxlevel . 9)
-                                (org-agenda-files :maxlevel . 9)))
+                                (org-agenda-files :maxlevel . 3)))
     (setq org-outline-path-complete-in-steps nil)         ; Refile in a single go
     (setq org-refile-use-outline-path t)                  ; Show full paths for refiling
     (setq org-agenda-skip-deadline-if-done t)
     (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
     (setq org-agenda-skip-scheduled-if-done t)
+    (setq org-stuck-projects
+          '("+project/-MAYBE-DONE" ("TODO" "NEXT" "NEXTACTION") nil ""))
 
     (setq org-global-properties
     '(("Effort_ALL". "0 0:10 0:30 1:00 2:00 3:00 4:00 8:00")))
@@ -413,7 +415,7 @@
  ;; If there is more than one, they won't work right.
  '(org-agenda-files
    (quote
-    ("~/org/cs.org" "~/org/acapo.org" "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/google.org" "~/org/casa.org" "~/org/inbox.org" "~/org/dev.org" "~/org/projects.org" "~/org/music.org")))
+    ("~/org/tblx.org" "~/org/cs.org" "~/org/acapo.org" "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/google.org" "~/org/casa.org" "~/org/inbox.org" "~/org/dev.org" "~/org/projects.org" "~/org/music.org")))
  '(org-modules
    (quote
     (org-bbdb org-bibtex org-docview org-gnus org-habit org-id org-info org-irc org-mhe org-protocol org-rmail org-w3m org-git-link org-mac-iCal org-mac-link org-panel org-screenshot org-jira)))
