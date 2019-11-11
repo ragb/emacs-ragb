@@ -198,8 +198,7 @@
   :bind (:map scala-mode-map ("C-c C-B c" . sbt-command))
   )
 
-
-(use-package sbt-mode :ensure t :pin melpa
+(use-package sbt-mode :ensure t :defer t :pin melpa
   :commands sbt-start sbt-command
   :config
   ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
@@ -207,10 +206,13 @@
   (substitute-key-definition
    'minibuffer-complete-word
    'self-insert-command
-   minibuffer-local-completion-map))
+   minibuffer-local-completion-map)
+   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+   (setq sbt:program-options '("-Dsbt.supershell=false"))
+)
 
 ;; Enable nice rendering of diagnostics like compile errors.
-(use-package flycheck :ensure t :pin melpa
+(use-package flycheck :ensure t :defer t :pin melpa
   :init (global-flycheck-mode))
 
 (use-package lsp-mode :ensure t :defer t :pin melpa
@@ -218,12 +220,12 @@
   :hook (scala-mode . lsp))
 
 
-(use-package lsp-ui :ensure t)
+(use-package lsp-ui :ensure t :defer t :pin melpa)
 
 
   
 
-(use-package company-lsp :ensure t)
+(use-package company-lsp :ensure t :defer t :pin melpa)
 
 (use-package ammonite-term-repl)
 
@@ -268,18 +270,18 @@
        (global-magit-file-mode)
        :bind (("C-x g" . magit-status)))
 
-(use-package git-link :ensure t
-  :config (add-to-list 'git-link-commit-remote-alist '("git\\.sys\\.off\\.192\\.internal" git-link-gitlab)))
-
-
-(use-package magit-gerrit :ensure t)
+(use-package git-link :ensure t)
 
 
 (use-package forge
   :after magit
   :pin melpa
-  :config
-  (add-to-list 'forge-alist '("git.sys.off.192.internal" "git.sys.off.192.internal/api/v4" "git.sys.off.192.internal" forge-gitlab-repository)))
+  :ensure t
+  :config (add-to-list 'forge-alist '("git.daimler.com" "git.daimler.com/api/v3" "git.daimler.com" forge-github-repository)))
+
+(use-package github-review :ensure t :defer t
+  :after forge)
+
 
 
 
@@ -421,7 +423,7 @@
     (org-bbdb org-bibtex org-docview org-gnus org-habit org-id org-info org-irc org-mhe org-protocol org-rmail org-w3m org-git-link org-mac-iCal org-mac-link org-panel org-screenshot org-jira)))
  '(package-selected-packages
    (quote
-    (flycheck-rust cargo ammonite-term-repl ob-ammonite org-re-reveal ox-reveal htmlize sql-indent format-sql csv-mode company-lsp forge org-plus-contrib org-make-toc epresent presentation org-present magit-filenotify magit-popup groovy-mode company-irony irony nov purescript-mode psc-ide json-mode mastodon org-projectile org-index org-jira git-timemachine ctags-update etags-select popup-imenu goto-chg undo-tree yasnippet-snippets sound-wav org-pomodoro org-alert grabe-mac-link grab-mac-link speechd-el company-racer racer magit-gerrit org-projectile-helm intero jira-markup-mode slack jira git-link ag yaml-mode rust-mode helm-idris idris-mode helm phabricator flycheck-pony image-archive flx-isearch flx-search flx-ido use-package smartparens projectile markdown-mode magit exec-path-from-shell)))
+    (github-review lsp-scala flycheck-rust cargo ammonite-term-repl ob-ammonite org-re-reveal ox-reveal htmlize sql-indent format-sql csv-mode company-lsp forge org-plus-contrib org-make-toc epresent presentation org-present magit-filenotify magit-popup groovy-mode company-irony irony nov purescript-mode psc-ide json-mode mastodon org-projectile org-index org-jira git-timemachine ctags-update etags-select popup-imenu goto-chg undo-tree yasnippet-snippets sound-wav org-pomodoro org-alert grabe-mac-link grab-mac-link speechd-el company-racer racer magit-gerrit org-projectile-helm intero jira-markup-mode slack jira git-link ag yaml-mode rust-mode helm-idris idris-mode helm phabricator flycheck-pony image-archive flx-isearch flx-search flx-ido use-package smartparens projectile markdown-mode magit exec-path-from-shell)))
  '(safe-local-variable-values
    (quote
     ((voice-lock-mode . t)
