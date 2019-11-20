@@ -118,9 +118,9 @@
       '(
         ("t" "Todo")
         ("tt" "Todo-normal" entry (file "inbox.org")
-         "* TODO %?\n")
+         "* TODO %?\n  %U\n  %i")
         ("ts" "Todo-safari" entry (file "inbox.org")
-         "* TODO %?\n %(org-mac-safari-get-frontmost-url)")
+         "* TODO %?\n  %U\n  %(org-mac-safari-get-frontmost-url)")
         ("n" "General notes")
         ("nc" "Note from clipboard contents" entry (file "inbox.org")
          "* %?\n- Stored on %U\n\n%x")
@@ -417,16 +417,17 @@
  ;; If there is more than one, they won't work right.
  '(org-agenda-files
    (quote
-    ("~/org/tblx.org" "~/org/cs.org" "~/org/acapo.org" "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org/google.org" "~/org/casa.org" "~/org/inbox.org" "~/org/dev.org" "~/org/projects.org" "~/org/music.org")))
+    ("~/org/google.org" "~/org/tblx.org" "~/org/cs.org" "~/org/acapo.org" "~/org/casa.org" "~/org/inbox.org" "~/org/dev.org" "~/org/projects.org" "~/org/music.org")))
  '(org-modules
    (quote
     (org-bbdb org-bibtex org-docview org-gnus org-habit org-id org-info org-irc org-mhe org-protocol org-rmail org-w3m org-git-link org-mac-iCal org-mac-link org-panel org-screenshot org-jira)))
  '(package-selected-packages
    (quote
-    (github-review lsp-scala flycheck-rust cargo ammonite-term-repl ob-ammonite org-re-reveal ox-reveal htmlize sql-indent format-sql csv-mode company-lsp forge org-plus-contrib org-make-toc epresent presentation org-present magit-filenotify magit-popup groovy-mode company-irony irony nov purescript-mode psc-ide json-mode mastodon org-projectile org-index org-jira git-timemachine ctags-update etags-select popup-imenu goto-chg undo-tree yasnippet-snippets sound-wav org-pomodoro org-alert grabe-mac-link grab-mac-link speechd-el company-racer racer magit-gerrit org-projectile-helm intero jira-markup-mode slack jira git-link ag yaml-mode rust-mode helm-idris idris-mode helm phabricator flycheck-pony image-archive flx-isearch flx-search flx-ido use-package smartparens projectile markdown-mode magit exec-path-from-shell)))
+    (yasnippet-classic-snippets github-review lsp-scala flycheck-rust cargo ammonite-term-repl ob-ammonite org-re-reveal ox-reveal htmlize sql-indent format-sql csv-mode company-lsp forge org-plus-contrib org-make-toc epresent presentation org-present magit-filenotify magit-popup groovy-mode company-irony irony nov purescript-mode psc-ide json-mode mastodon org-projectile org-index org-jira git-timemachine ctags-update etags-select popup-imenu goto-chg undo-tree yasnippet-snippets sound-wav org-pomodoro org-alert grabe-mac-link grab-mac-link speechd-el company-racer racer magit-gerrit org-projectile-helm intero jira-markup-mode slack jira git-link ag yaml-mode rust-mode helm-idris idris-mode helm phabricator flycheck-pony image-archive flx-isearch flx-search flx-ido use-package smartparens projectile markdown-mode magit exec-path-from-shell)))
  '(safe-local-variable-values
    (quote
-    ((voice-lock-mode . t)
+    ((github-review-host . "git.daimler.com/api/v3")
+     (voice-lock-mode . t)
      (folded-file . t)
      (giralib-url . "https://icdpub.jira.com")))))
 (custom-set-faces
