@@ -1,5 +1,5 @@
 (use-package lsp-mode :ensure t :defer t :pin melpa
-  :init (setq lsp-prefer-flymake nil)
+  :config (setq lsp-prefer-flymake nil)
   :hook (scala-mode . lsp)
   (lsp-mode . lsp-lens-mode)
   )
@@ -22,11 +22,4 @@
   :hook
   (lsp-mode . dap-mode)
   (lsp-mode . dap-ui-mode)
-  )
-
-;; Use the Tree View Protocol for viewing the project structure and triggering compilation
-(use-package lsp-treemacs :ensure t
-  :config
-  (lsp-metals-treeview-enable t)
-  (setq lsp-metals-treeview-show-when-views-received t)
   )

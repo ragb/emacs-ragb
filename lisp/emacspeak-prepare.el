@@ -17,5 +17,6 @@
 (setq emacspeak-play-program "afplay")
 
 (setq emacspeak-eldoc-speak-explicitly nil)
-(emacspeak-tts-startup-hook)
 (dtk-set-language "pt-pt")
+
+

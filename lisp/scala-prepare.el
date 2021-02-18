@@ -17,6 +17,10 @@
    (setq sbt:program-options '("-Dsbt.supershell=false"))
 )
 
+;; Add metals backend for lsp-mode
+(use-package lsp-metals)
+
+
 
 (use-package ammonite-term-repl)
 
@@ -33,3 +37,12 @@
 (define-key scala-mode-map (kbd "<tab>") #'company-indent-or-complete-common)
             (scala-mode:goto-start-of-code)
             (voice-lock-mode nil)))
+
+
+;; Use the Tree View Protocol for viewing the project structure and triggering compilation
+(use-package lsp-treemacs
+  :config
+  (lsp-metals-treeview-enable t)
+  (setq lsp-metals-treeview-show-when-views-received t)
+  )
+

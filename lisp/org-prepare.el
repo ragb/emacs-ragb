@@ -1,4 +1,4 @@
-(use-package org :ensure t :pin melpa
+(use-package org :ensure t :pin org
   :preface
       (defun org-journal-find-location ()
   ;; Open today's journal, but specify a non-nil prefix argument in order to
@@ -100,3 +100,21 @@
     (setq org-pomodoro-ask-upon-killing nil)
     (setq org-pomodoro-manual-break t)
     )
+
+
+  
+;; org-roam
+(use-package org-roam
+  :after org
+  :hook (org-mode . org-roam-mode)
+  :custom
+  (org-roam-directory "~/org/roam/")
+  (org-roam-index-file "index")
+  :bind
+  ("C-c n l" . org-roam)
+  ("C-c n t" . org-roam-dailies-today)
+  ("C-c n y" . org-roam-dailies-yesterday)
+  ("C-c n f" . org-roam-find-file)
+  ("C-c n i" . org-roam-insert)
+  ("C-c n j" . org-roam-jump-to-index)
+  ("C-c n g" . org-roam-show-graph))

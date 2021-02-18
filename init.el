@@ -89,6 +89,8 @@
   :init (global-flycheck-mode))
 
 (load-library "lsp-prepare.el")
+(load-library "kotlin-prepare.el")
+
 
 
 (use-package yasnippet
@@ -146,6 +148,9 @@
 ;; webpaste
 (load-library "webpaste-prepare.el")
 
+;; protobuf
+(load-library "protobuf-prepare.el"
+)
 
 ;; Mac keyboard
 (when (string-equal system-type "darwin")
@@ -184,19 +189,15 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(org-agenda-files
-   (quote
-    ("~/org/google.org" "~/org/tblx.org" "~/org/cs.org" "~/org/casa.org" "~/org/inbox.org" "~/org/dev.org" "~/org/projects.org" "~/org/music.org")))
+   '("~/org/google.org" "~/org/tblx.org" "~/org/cs.org" "~/org/casa.org" "~/org/inbox.org" "~/org/dev.org" "~/org/projects.org" "~/org/music.org"))
  '(org-modules
-   (quote
-    (org-bbdb org-bibtex org-docview org-gnus org-habit org-id org-info org-irc org-mHe org-protocol org-rmail org-w3m org-git-link org-mac-iCal org-mac-link org-panel org-screenshot org-jira)))
+   '(org-bbdb org-bibtex org-docview org-gnus org-habit org-id org-info org-irc org-mHe org-protocol org-rmail org-w3m org-git-link org-mac-iCal org-mac-link org-panel org-screenshot org-jira))
  '(package-selected-packages
-   (quote
-    (org-journal-list treemacs-projectile confluence plantuml-mode yasnippet-classic-snippets github-review lsp-scala flycheck-rust cargo ammonite-term-repl ob-ammonite org-re-reveal ox-reveal htmlize sql-indent format-sql csv-mode company-lsp forge org-plus-contrib org-make-toc epresent presentation org-present magit-filenotify magit-popup groovy-mode company-irony irony nov purescript-mode psc-ide json-mode mastodon org-projectile org-index org-jira git-timemachine ctags-update etags-select popup-imenu goto-chg undo-tree yasnippet-snippets sound-wav org-pomodoro org-alert grabe-mac-link grab-mac-link speechd-el company-racer racer magit-gerrit org-projectile-helm intero jira-markup-mode slack jira git-link ag yaml-mode rust-mode helm-idris idris-mode helm phabricator flycheck-pony image-archive flx-isearch flx-search flx-ido use-package smartparens projectile markdown-mode magit exec-path-from-shell)))
+   '(kotlin-mode ox-jira protobuf-mode excorporate org-roam lsp-metals org-journal-list treemacs-projectile confluence plantuml-mode yasnippet-classic-snippets github-review lsp-scala flycheck-rust cargo ammonite-term-repl ob-ammonite org-re-reveal ox-reveal htmlize sql-indent format-sql csv-mode company-lsp forge org-plus-contrib org-make-toc epresent presentation org-present magit-filenotify magit-popup groovy-mode company-irony irony nov purescript-mode psc-ide json-mode mastodon org-projectile org-index org-jira git-timemachine ctags-update etags-select popup-imenu goto-chg undo-tree yasnippet-snippets sound-wav org-pomodoro org-alert grabe-mac-link grab-mac-link speechd-el company-racer racer magit-gerrit org-projectile-helm intero jira-markup-mode slack jira git-link ag yaml-mode rust-mode helm-idris idris-mode helm phabricator flycheck-pony image-archive flx-isearch flx-search flx-ido use-package smartparens projectile markdown-mode magit exec-path-from-shell))
  '(safe-local-variable-values
-   (quote
-    ((github-review-host . "git.daimler.com/api/v3")
+   '((github-review-host . "git.daimler.com/api/v3")
      (voice-lock-mode . t)
-     (folded-file . t)))))
+     (folded-file . t))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
