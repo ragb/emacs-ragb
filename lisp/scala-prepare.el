@@ -1,5 +1,6 @@
 ;; Enable scala-mode and sbt-mode
 (use-package scala-mode :ensure t :defer t :pin melpa
+  :interpreter ("scala" . scala-mode)
   :mode "\\.s\\(cala\\|bt\\)$"
   :bind (:map scala-mode-map ("C-c C-B c" . sbt-command))
   )
@@ -18,7 +19,8 @@
 )
 
 ;; Add metals backend for lsp-mode
-(use-package lsp-metals)
+(use-package lsp-metals :pin melpa)
+
 
 
 
@@ -40,8 +42,8 @@
 
 
 ;; Use the Tree View Protocol for viewing the project structure and triggering compilation
-(use-package lsp-treemacs
-  :config
+(use-package lsp-treemacs :pin melpa
+  :config 
   (lsp-metals-treeview-enable t)
   (setq lsp-metals-treeview-show-when-views-received t)
   )

@@ -3,7 +3,7 @@
 (setq load-path (cons "~/.emacs.d/lisp" load-path))
 
 
-(load-library "emacspeak-prepare")
+
 
 ;; global variables
 (setq
@@ -34,23 +34,23 @@
 (global-unset-key (kbd "C-z"))
 
 
+(load-library "emacspeak-prepare")
 
 ;; Packages
 (require 'package )
 (setq
  package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                    ("org" . "http://orgmode.org/elpa/")
                     ("melpa" . "http://melpa.org/packages/")
                     ("melpa-stable" . "http://stable.melpa.org/packages/")
 ))
 
 (package-initialize)
 
+
 ;; Bootstrap `use-package'
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
-
 
 
 ;; Initialize path from shell.
@@ -65,7 +65,7 @@
 
 ;; ORG
 (load-library "org-prepare")
-
+(load-library "bibtex-prepare")
 (use-package grab-mac-link)
 
 (load-library "helm-prepare")
@@ -81,6 +81,7 @@
 
 (load-library "company-prepare.el")
 (load-library "scala-prepare.el")
+(load-library "java-prepare.el")
 
 
 
@@ -114,11 +115,6 @@
 
 
 
-
-
-(use-package intero :ensure t
-  :config
-  (add-hook 'haskell-mode-hook 'intero-mode))
 
 
 ;; Mastodon
@@ -181,6 +177,7 @@
 
 
 
+
 ;; save /reload desktop
 (desktop-save-mode 1)
 (custom-set-variables
@@ -189,11 +186,11 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(org-agenda-files
-   '("~/org/google.org" "~/org/tblx.org" "~/org/cs.org" "~/org/casa.org" "~/org/inbox.org" "~/org/dev.org" "~/org/projects.org" "~/org/music.org"))
+   '("~/org/uest.org" "/Users/batirui/org/google.org" "/Users/batirui/org/tblx.org" "/Users/batirui/org/cs.org" "/Users/batirui/org/casa.org" "/Users/batirui/org/inbox.org" "/Users/batirui/org/dev.org" "/Users/batirui/org/projects.org" "/Users/batirui/org/music.org"))
  '(org-modules
    '(org-bbdb org-bibtex org-docview org-gnus org-habit org-id org-info org-irc org-mHe org-protocol org-rmail org-w3m org-git-link org-mac-iCal org-mac-link org-panel org-screenshot org-jira))
  '(package-selected-packages
-   '(kotlin-mode ox-jira protobuf-mode excorporate org-roam lsp-metals org-journal-list treemacs-projectile confluence plantuml-mode yasnippet-classic-snippets github-review lsp-scala flycheck-rust cargo ammonite-term-repl ob-ammonite org-re-reveal ox-reveal htmlize sql-indent format-sql csv-mode company-lsp forge org-plus-contrib org-make-toc epresent presentation org-present magit-filenotify magit-popup groovy-mode company-irony irony nov purescript-mode psc-ide json-mode mastodon org-projectile org-index org-jira git-timemachine ctags-update etags-select popup-imenu goto-chg undo-tree yasnippet-snippets sound-wav org-pomodoro org-alert grabe-mac-link grab-mac-link speechd-el company-racer racer magit-gerrit org-projectile-helm intero jira-markup-mode slack jira git-link ag yaml-mode rust-mode helm-idris idris-mode helm phabricator flycheck-pony image-archive flx-isearch flx-search flx-ido use-package smartparens projectile markdown-mode magit exec-path-from-shell))
+   '(grab-x-link babel org lsp-java ox-jira protobuf-mode lsp-metals treemacs-projectile confluence plantuml-mode yasnippet-classic-snippets github-review flycheck-rust cargo ammonite-term-repl org-re-reveal ox-reveal htmlize sql-indent format-sql csv-mode company-lsp forge org-plus-contrib org-make-toc epresent presentation org-present magit-filenotify magit-popup groovy-mode company-irony irony nov purescript-mode psc-ide json-mode mastodon org-projectile org-index org-jira git-timemachine ctags-update etags-select popup-imenu goto-chg undo-tree yasnippet-snippets sound-wav org-pomodoro org-alert grabe-mac-link grab-mac-link speechd-el company-racer racer org-projectile-helm jira-markup-mode slack jira git-link ag yaml-mode rust-mode helm-idris idris-mode helm phabricator flycheck-pony image-archive flx-isearch flx-search flx-ido use-package smartparens projectile markdown-mode magit exec-path-from-shell))
  '(safe-local-variable-values
    '((github-review-host . "git.daimler.com/api/v3")
      (voice-lock-mode . t)
@@ -207,3 +204,4 @@
 (put 'downcase-region 'disabled nil)
 (put 'scroll-left 'disabled nil)
 (put 'upcase-region 'disabled nil)
+(put 'dired-find-alternate-file 'disabled nil)

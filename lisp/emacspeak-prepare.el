@@ -10,9 +10,9 @@
   (setq mac-default-speech-rate 480)
   (mac-define-voice 'joana " [{voice joana}] "))
 (emacspeak-toggle-auditory-icons t)
-(emacspeak-sounds-select-theme "classic/")
-(setq tts-default-speech-rate 90)
-(setq espeak-default-speech-rate 400)
+(emacspeak-sounds-select-theme "classic")
+(setq tts-default-speech-rate 450)
+(setq espeak-default-speech-rate 450)
 (setq emacspeak-tts-use-notify-stream  t)
 (setq emacspeak-play-program "afplay")
 
@@ -20,3 +20,4 @@
 (dtk-set-language "pt-pt")
 
 
+ 
